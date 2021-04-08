@@ -32,6 +32,8 @@ public class TrafficLightGui extends JFrame implements ActionListener {
 
     private int intervall = 1500;
 
+    private int count = 0;
+
     public TrafficLightGui(TrafficLightCtrl ctrl){
         super(NAME_OF_THE_GAME);
         trafficLightCtrl = ctrl;
@@ -76,15 +78,33 @@ public class TrafficLightGui extends JFrame implements ActionListener {
     public void run() {
         while (!doExit) {
             try {
-                Thread.sleep(100);
+                Thread.sleep(3000);
             } catch (InterruptedException e) {
                 JOptionPane pane = new JOptionPane();
                 JDialog dialog = pane.createDialog(this,"Traffic Light Problem");
                 JOptionPane.showMessageDialog(dialog, e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
                 return;
             }
+            /**
+             * BEGIN REFERENCE AUTHOR | CO-AUTHORS Thomas Lerchbaumer, Thomas Gutjahr
+             */
+            while(count < 5 && trafficLightCtrl.getCurrentState().equals(trafficLightCtrl.getYellowState())){
+                try{
+                    if(yellow.isOn){
+                        yellow.turnOn(false);
+                    } else {
+                        yellow.turnOn(true);
+                    }
+                    Thread.sleep(1000);
+                } catch (InterruptedException e){}
+                count++;
+            }
+            /**
+             * END
+             */
              while (isAutoMode) {
                  //TODO call the controller
+                 trafficLightCtrl.nextState();
 
                 try {
                     if (yellow.isOn) {
@@ -114,5 +134,22 @@ public class TrafficLightGui extends JFrame implements ActionListener {
 
     public void setLight(TrafficLightColor trafficLightColor){
         //TODO setLight
+        if(trafficLightColor.equals(TrafficLightColor.RED)){
+            red.turnOn(true);
+            yellow.turnOn(false);
+            green.turnOn(false);
+            count = 0;
+        }
+        if(trafficLightColor.equals(TrafficLightColor.YELLOW)){
+            yellow.turnOn(true);
+            red.turnOn(false);
+            green.turnOn(false);
+        }
+        if(trafficLightColor.equals(TrafficLightColor.GREEN)){
+            green.turnOn(true);
+            red.turnOn(false);
+            yellow.turnOn(false);
+            count = 0;
+        }
     }
 }
